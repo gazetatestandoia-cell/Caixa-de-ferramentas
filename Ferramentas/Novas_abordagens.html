@@ -134,6 +134,13 @@
         let activeInputTab = 'url';
         let lastAnalysisInput = { type: '', value: '' };
 
+        // --- Chave de API do Usuário ---
+        // IMPORTANTE: Para usar este código fora do ambiente Gemini, você precisa
+        // de sua própria chave de API do Google AI.
+        // 1. Obtenha sua chave em: https://aistudio.google.com/app/apikey
+        // 2. Cole sua chave abaixo, substituindo "SUA_CHAVE_API_VAI_AQUI".
+        const USER_API_KEY = "AIzaSyBS4FaQ1okqftnyK37UQdyuG308FRr0V4Y";
+
         // --- Event Listeners ---
         tabUrl.addEventListener('click', () => switchInputTab('url'));
         tabTema.addEventListener('click', () => switchInputTab('tema'));
@@ -158,7 +165,11 @@
 
         // --- Chamadas à API ---
         async function callGeminiAPI(userQuery, systemPrompt) {
-            const apiKey = ""; 
+            if (!USER_API_KEY || USER_API_KEY === "SUA_CHAVE_API_VAI_AQUI") {
+                throw new Error("Chave de API não configurada. Por favor, adicione sua chave de API do Google AI no código.");
+            }
+            
+            const apiKey = USER_API_KEY; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
@@ -190,7 +201,7 @@
             const candidate = result.candidates?.[0];
             if (!candidate || !candidate.content?.parts?.[0]?.text) throw new Error("A resposta da API está incompleta ou vazia.");
 
-            const responseText = candidate.content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+            const responseText = candidate.content.parts[0].text.replaceAll('```json', '').replaceAll('```', '').trim();
             try {
                 return JSON.parse(responseText);
             } catch (parseError) {
@@ -316,3 +327,5 @@
     </script>
 </body>
 </html>
+
+
