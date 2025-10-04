@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Threads para Redes Sociais</title>
+    <!-- Incluindo Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Incluindo a biblioteca Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-3xl bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 space-y-8">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">Gerador de Threads</h1>
+            <p class="text-gray-400 mt-2">Transforme qualquer artigo ou reportagem em uma thread.</p>
+        </div>
+
+        <!-- Área de Inserção do Link -->
+        <div class="space-y-4">
+            <label for="articleUrl" class="font-semibold text-gray-300">Link</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="url" id="articleUrl" class="flex-grow w-full p-3 bg-gray-700 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-300" placeholder="https://exemplo.com/noticia...">
+                <button id="generateBtn" class="w-full sm:w-auto bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span>Gerar Thread</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Área de Resultado -->
+        <div id="resultArea" class="space-y-4">
+            <!-- Mensagem de status inicial -->
+            <div id="statusMessageContainer" class="bg-gray-700 rounded-lg p-8 flex flex-col items-center justify-center text-center text-gray-400 min-h-[200px]">
+                <div id="statusMessageContent">
+                    <i data-lucide="newspaper" class="w-16 h-16 mb-4 text-gray-500 mx-auto"></i>
+                    <p>Sua thread aparecerá aqui.</p>
+                </div>
+            </div>
+
+            <!-- Container para a thread gerada -->
+            <div id="threadContainer" class="space-y-3 hidden">
+                <!-- Tweets serão inseridos aqui dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const articleUrlInput = document.getElementById('articleUrl');
+        const generateBtn = document.getElementById('generateBtn');
+        const statusMessageContainer = document.getElementById('statusMessageContainer');
+        const statusMessageContent = document.getElementById('statusMessageContent');
+        const threadContainer = document.getElementById('threadContainer');
+
+        // Inicializa os ícones do Lucide
+        lucide.createIcons();
+
+        // --- Função para copiar texto ---
+        function copyToClipboard(text, button) {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = text;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            try {
+                document.execCommand('copy');
+                const originalIcon = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-green-400"></i>`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    button.innerHTML = originalIcon;
+                    button.disabled = false;
+                }, 2000);
+            } catch (err) {
+                console.error('Falha ao copiar: ', err);
+                const originalIcon = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = `<i data-lucide="x" class="w-4 h-4 text-red-400"></i>`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    button.innerHTML = originalIcon;
+                    button.disabled = false;
+                }, 2000);
+            }
+            document.body.removeChild(tempTextarea);
+        }
+        
+        function setStatus(htmlContent) {
+            statusMessageContent.innerHTML = htmlContent;
+            lucide.createIcons(); // Re-renderiza ícones se houver algum novo
+            statusMessageContainer.classList.remove('hidden');
+            threadContainer.classList.add('hidden');
+        }
+
+        // --- Event Listener para o botão de gerar ---
+        generateBtn.addEventListener('click', async () => {
+            const url = articleUrlInput.value.trim();
+            if (!url || !url.startsWith('http')) {
+                setStatus(`
+                    <i data-lucide="alert-triangle" class="w-16 h-16 mb-4 text-yellow-500 mx-auto"></i>
+                    <p>Por favor, insira um link válido.</p>`);
+                return;
+            }
+
+            // --- Prepara a UI para o estado de carregamento ---
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Gerando...`;
+            setStatus(`
+                <i data-lucide="bot" class="w-16 h-16 mb-4 text-gray-500 animate-pulse mx-auto"></i>
+                <p>Lendo a matéria e preparando sua thread... Isso pode levar um momento.</p>`);
+            threadContainer.innerHTML = '';
+
+            try {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const systemPrompt = `Você é um especialista em mídias sociais que cria threads para o X (Twitter). Sua tarefa é resumir uma reportagem em uma thread.
+                REGRAS:
+                1. Crie entre 4 e 10 tweets.
+                2. Numere cada tweet (ex: 1/5, 2/5...).
+                3. Cada tweet deve ter menos de 280 caracteres.
+                4. Use emojis relevantes.
+                5. O último tweet deve conter 3-5 hashtags.
+                6. Mantenha um tom neutro e jornalístico.
+                7. A resposta DEVE ser em português do Brasil.
+                8. IMPORTANTE: Sua resposta deve conter APENAS a thread numerada, sem nenhuma introdução, título, conclusão ou qualquer outro texto. Comece diretamente no "1/X".`;
+                
+                const userQuery = `Com base no conteúdo da reportagem no link a seguir, crie uma thread: ${url}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log("Resposta da API:", result); // Log para depuração
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                     throw new Error('A resposta da IA está vazia ou em formato inesperado.');
+                }
+                
+                displayThread(text);
+
+            } catch (error) {
+                console.error("Erro ao gerar thread:", error);
+                setStatus(`
+                    <i data-lucide="server-crash" class="w-16 h-16 mb-4 text-red-500 mx-auto"></i>
+                    <p class="font-semibold">Ocorreu um erro!</p>
+                    <p class="text-sm text-gray-500 mt-2">${error.message}</p>
+                    <p class="text-sm text-gray-500">Tente novamente ou verifique o link.</p>`);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i data-lucide="sparkles" class="w-5 h-5"></i> <span>Gerar Thread</span>`;
+                lucide.createIcons();
+            }
+        });
+
+        function displayThread(threadText) {
+            const lines = threadText.split('\n');
+            const tweets = lines.filter(line => /^\d+[\/\.\-]\s?/.test(line.trim()));
+
+            if (tweets.length === 0) {
+                 setStatus(`
+                    <i data-lucide="frown" class="w-16 h-16 mb-4 text-yellow-500 mx-auto"></i>
+                    <p class="font-semibold">Não consegui formatar a thread.</p>
+                    <p class="text-sm text-gray-400 mt-2 mb-4">A IA respondeu o seguinte (você pode copiar o texto manualmente):</p>
+                    <div class="bg-gray-800 text-left text-xs p-3 rounded-md whitespace-pre-wrap">${threadText}</div>
+                 `);
+                 return;
+            }
+            
+            threadContainer.innerHTML = '';
+            tweets.forEach(tweetContent => {
+                const tweetElement = document.createElement('div');
+                tweetElement.className = 'bg-gray-700/50 p-4 rounded-lg flex items-start gap-4';
+                
+                const originalTextWithNumbering = tweetContent.trim();
+
+                tweetElement.innerHTML = `
+                    <div class="tweet-content flex-grow text-gray-300 whitespace-pre-wrap rounded-md focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-sky-500 transition-all duration-200" contenteditable="false">${originalTextWithNumbering}</div>
+                    <div class="flex flex-col gap-2 shrink-0">
+                        <button class="copy-btn shrink-0 bg-gray-600 hover:bg-gray-500 text-gray-300 font-semibold p-2 rounded-md flex items-center justify-center transition-colors duration-200" title="Copiar tweet">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                        <button class="edit-btn shrink-0 bg-gray-600 hover:bg-gray-500 text-gray-300 font-semibold p-2 rounded-md flex items-center justify-center transition-colors duration-200" title="Editar tweet">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                
+                const tweetContentDiv = tweetElement.querySelector('.tweet-content');
+                const copyBtn = tweetElement.querySelector('.copy-btn');
+                const editBtn = tweetElement.querySelector('.edit-btn');
+                
+                copyBtn.addEventListener('click', () => {
+                    // Copia o texto do tweet sem a numeração inicial
+                    const textToCopy = tweetContentDiv.innerText.replace(/^\d+[\/\.\-]\s?/, '').trim();
+                    copyToClipboard(textToCopy, copyBtn);
+                });
+
+                editBtn.addEventListener('click', () => {
+                    const isEditing = tweetContentDiv.isContentEditable;
+
+                    if (isEditing) {
+                        // --- MODO SALVAR ---
+                        tweetContentDiv.contentEditable = false;
+                        tweetContentDiv.classList.remove('bg-gray-600', 'p-2', 'shadow-inner'); // Remove estilos de edição
+                        
+                        editBtn.innerHTML = `<i data-lucide="pencil" class="w-4 h-4"></i>`;
+                        editBtn.title = "Editar tweet";
+                        lucide.createIcons();
+                    } else {
+                        // --- MODO EDITAR ---
+                        tweetContentDiv.contentEditable = true;
+                        tweetContentDiv.classList.add('bg-gray-600', 'p-2', 'shadow-inner'); // Adiciona estilos de edição
+                        tweetContentDiv.focus(); // Foca no elemento para edição
+                        
+                        editBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i>`;
+                        editBtn.title = "Salvar tweet";
+                        lucide.createIcons();
+                    }
+                });
+                
+                threadContainer.appendChild(tweetElement);
+            });
+
+            statusMessageContainer.classList.add('hidden');
+            threadContainer.classList.remove('hidden');
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
+
