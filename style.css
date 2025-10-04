@@ -1,0 +1,218 @@
+/* Paleta de Cores Inspirada na Rede Gazeta */
+:root {
+    --azul-principal: #003366;
+    --laranja-destaque: #ff6600;
+    --branco-texto: #FFFFFF;
+    --cinza-claro-fundo: #f0f2f5;
+    --azul-texto-card: #003366;
+}
+
+body {
+    background-color: var(--azul-principal);
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23002244' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    font-family: 'Roboto Condensed', sans-serif;
+    color: var(--branco-texto);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding-bottom: 90px;
+}
+
+.main-header {
+    margin-bottom: 40px;
+}
+
+.main-header h1 {
+    font-family: 'Teko', sans-serif;
+    font-size: 3.5em;
+    color: var(--laranja-destaque);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    margin: 0;
+}
+
+.main-header p {
+    font-size: 1.2em;
+    color: var(--branco-texto);
+    opacity: 0.9;
+}
+
+.toolbox-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.tool-card {
+    background-color: var(--cinza-claro-fundo);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    border: 2px solid transparent;
+}
+
+.tool-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+    border-color: var(--laranja-destaque);
+}
+
+.tool-card .tool-icon {
+    color: var(--azul-texto-card);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+}
+
+.tool-card.placeholder .tool-icon {
+    font-size: 4em;
+    font-weight: bold;
+    color: var(--laranja-destaque);
+    margin-bottom: 0;
+}
+
+.tool-card .tool-name {
+    margin-top: 15px;
+    font-weight: 700;
+    color: var(--azul-texto-card);
+}
+
+.tool-card.placeholder .tool-name {
+    color: var(--laranja-destaque);
+}
+
+.footer-brands {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.footer-brands .brand-logo {
+    height: 45px;
+    width: auto;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.footer-brands .brand-logo:hover {
+    opacity: 1;
+}
+
+.footer-brands .logo-ajuste {
+    height: 55px;
+}
+
+/* ESTILOS PARA O MODAL PRINCIPAL (IFRAME) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 34, 68, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--cinza-claro-fundo);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    position: relative;
+    width: 90vw;
+    height: 90vh;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-close-button {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--laranja-destaque);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.modal-close-button:hover {
+    transform: scale(1.1);
+}
+
+#tool-iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+
+
+/* ================================================= */
+/* ESTILOS PARA O MODAL DE ALERTA SIMPLES            */
+/* ================================================= */
+
+.alert-modal-content {
+    background-color: var(--cinza-claro-fundo);
+    color: var(--azul-texto-card);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    font-size: 1.2em;
+    line-height: 1.6;
+    /* Animação de entrada */
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .alert-modal-content {
+    transform: scale(1);
+}}
