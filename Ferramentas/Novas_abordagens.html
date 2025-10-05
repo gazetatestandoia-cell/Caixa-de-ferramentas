@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Pautas Jornalísticas com IA</title>
+    <title>Outras abordagens sobre um assunto</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -133,13 +133,20 @@
 
         let activeInputTab = 'url';
         let lastAnalysisInput = { type: '', value: '' };
+        
+        // =========================================================================
+        // ======================= INSERIR CHAVE DE API AQUI =======================
+        //
+        // IMPORTANTE: Para usar este código fora do ambiente de desenvolvimento, 
+        // você precisa da sua própria chave de API do Google AI.
+        // 1. Obtenha a sua chave em: https://aistudio.google.com/app/apikey
+        // 2. Cole a chave abaixo, substituindo "SUA_CHAVE_API_VAI_AQUI".
+        //
+        const USER_API_KEY = "gen-lang-client-0264351389";
+        //
+        // =========================================================================
+        // =========================================================================
 
-        // --- Chave de API do Usuário ---
-        // IMPORTANTE: Para usar este código fora do ambiente Gemini, você precisa
-        // de sua própria chave de API do Google AI.
-        // 1. Obtenha sua chave em: https://aistudio.google.com/app/apikey
-        // 2. Cole sua chave abaixo, substituindo "SUA_CHAVE_API_VAI_AQUI".
-        const USER_API_KEY = "AIzaSyBS4FaQ1okqftnyK37UQdyuG308FRr0V4Y";
 
         // --- Event Listeners ---
         tabUrl.addEventListener('click', () => switchInputTab('url'));
@@ -166,10 +173,10 @@
         // --- Chamadas à API ---
         async function callGeminiAPI(userQuery, systemPrompt) {
             if (!USER_API_KEY || USER_API_KEY === "SUA_CHAVE_API_VAI_AQUI") {
-                throw new Error("Chave de API não configurada. Por favor, adicione sua chave de API do Google AI no código.");
+                throw new Error("Chave de API não configurada. Por favor, adicione a sua chave de API do Google AI no código.");
             }
             
-            const apiKey = USER_API_KEY; 
+            const apiKey = USER_API_KEY;
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
@@ -327,5 +334,7 @@
     </script>
 </body>
 </html>
+
+
 
 
