@@ -9,16 +9,14 @@
 
 body {
     background-color: var(--azul-principal);
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23002244' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w.w3.org/2000/svg'%3E%3Cg fill='%23002244' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
     font-family: 'Roboto Condensed', sans-serif;
     color: var(--branco-texto);
     margin: 0;
     padding: 20px;
     text-align: center;
-    position: relative;
     min-height: 100vh;
     box-sizing: border-box;
-    padding-bottom: 90px;
 }
 
 .main-header {
@@ -43,7 +41,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 25px;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.2);
@@ -96,31 +94,6 @@ body {
 
 .tool-card.placeholder .tool-name {
     color: var(--laranja-destaque);
-}
-
-.footer-brands {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-.footer-brands .brand-logo {
-    height: 45px;
-    width: auto;
-    opacity: 0.7;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.footer-brands .brand-logo:hover {
-    opacity: 1;
-}
-
-.footer-brands .logo-ajuste {
-    height: 190px;
 }
 
 /* ESTILOS PARA O MODAL PRINCIPAL (IFRAME) */
@@ -178,7 +151,8 @@ body {
     justify-content: center;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, top 0.3s ease, right 0.3s ease; /* Adicionada transição */
+    z-index: 1010; /* Garante que fique acima do iframe */
 }
 
 .modal-close-button:hover {
@@ -192,10 +166,7 @@ body {
 }
 
 
-/* ================================================= */
-/* ESTILOS PARA O MODAL DE ALERTA SIMPLES            */
-/* ================================================= */
-
+/* ESTILOS PARA O MODAL DE ALERTA SIMPLES */
 .alert-modal-content {
     background-color: var(--cinza-claro-fundo);
     color: var(--azul-texto-card);
@@ -208,12 +179,35 @@ body {
     text-align: center;
     font-size: 1.2em;
     line-height: 1.6;
-    /* Animação de entrada */
     transform: scale(0.9);
     transition: transform 0.3s ease;
 }
 
 .modal-overlay.active .alert-modal-content {
     transform: scale(1);
+}
 
-}}
+/* ================================================= */
+/* AJUSTES PARA EXPERIÊNCIA MOBILE                   */
+/* ================================================= */
+
+@media (max-width: 768px) {
+    .modal-content {
+        /* Ocupa a tela inteira no mobile para máximo aproveitamento */
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        padding: 10px;
+    }
+
+    .modal-close-button {
+        /* Reposiciona o botão para DENTRO do modal */
+        top: 15px;
+        right: 15px;
+        /* Reduz o tamanho para telas menores */
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+}
+
