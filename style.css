@@ -9,7 +9,7 @@
 
 body {
     background-color: var(--azul-principal);
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w.w3.org/2000/svg'%3E%3Cg fill='%23002244' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23002244' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
     font-family: 'Roboto Condensed', sans-serif;
     color: var(--branco-texto);
     margin: 0;
@@ -151,8 +151,8 @@ body {
     justify-content: center;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.2s ease, top 0.3s ease, right 0.3s ease; /* Adicionada transição */
-    z-index: 1010; /* Garante que fique acima do iframe */
+    transition: transform 0.2s ease, top 0.3s ease, right 0.3s ease;
+    z-index: 1010;
 }
 
 .modal-close-button:hover {
@@ -164,7 +164,6 @@ body {
     height: 100%;
     border-radius: 5px;
 }
-
 
 /* ESTILOS PARA O MODAL DE ALERTA SIMPLES */
 .alert-modal-content {
@@ -188,26 +187,30 @@ body {
 }
 
 /* ================================================= */
-/* AJUSTES PARA EXPERIÊNCIA MOBILE                   */
+/* AJUSTES PARA EXPERIÊNCIA MOBILE (COM SAFE AREA)   */
 /* ================================================= */
 
 @media (max-width: 768px) {
     .modal-content {
-        /* Ocupa a tela inteira no mobile para máximo aproveitamento */
         width: 100vw;
         height: 100vh;
         border-radius: 0;
-        padding: 10px;
+        /* Adiciona padding para respeitar as áreas seguras do iPhone */
+        padding-top: calc(10px + env(safe-area-inset-top));
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
     }
 
     .modal-close-button {
-        /* Reposiciona o botão para DENTRO do modal */
-        top: 15px;
-        right: 15px;
-        /* Reduz o tamanho para telas menores */
+        /* Reposiciona o botão para DENTRO, considerando as áreas seguras */
+        top: calc(15px + env(safe-area-inset-top));
+        right: calc(15px + env(safe-area-inset-right));
         width: 36px;
         height: 36px;
         font-size: 20px;
     }
 }
+
 
