@@ -120,7 +120,7 @@ body {
 }
 
 .footer-brands .logo-ajuste {
-    height: 55px;
+    height: 190px;
 }
 
 /* ESTILOS PARA O MODAL PRINCIPAL (IFRAME) */
@@ -215,4 +215,5 @@ body {
 
 .modal-overlay.active .alert-modal-content {
     transform: scale(1);
+
 }}
