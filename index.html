@@ -18,6 +18,7 @@
 
     <main class="toolbox-container">
         
+        <!-- 1. Novas Abordagens -->
         <div class="tool-card" data-tool-url="Ferramentas/Novas_abordagens.html">
             <div class="tool-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="80" height="80">
@@ -27,6 +28,7 @@
             <span class="tool-name">Novas Abordagens</span>
         </div>
         
+        <!-- 2. Gerador de Story -->
         <div class="tool-card" data-tool-url="Ferramentas/gerador_arte.html">
             <div class="tool-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="80" height="80">
@@ -36,6 +38,7 @@
             <span class="tool-name">Gerador de Story</span>
         </div>
 
+        <!-- 3. Gerador de Threads -->
         <div class="tool-card" data-tool-url="Ferramentas/Threads.html">
             <div class="tool-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="80" height="80">
@@ -45,6 +48,7 @@
             <span class="tool-name">Gerador de Threads</span>
         </div>
         
+        <!-- 4. Revisor de Textos -->
         <div class="tool-card" data-tool-url="Ferramentas/Revisor.html">
             <div class="tool-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="80" height="80">
@@ -53,13 +57,31 @@
             </div>
             <span class="tool-name">Revisor de Textos</span>
         </div>
-        </main>
+
+        <!-- 5. Roteiro para TV -->
+        <div class="tool-card" data-tool-url="Ferramentas/PraTV.html">
+            <div class="tool-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="80" height="80">
+                  <path fill-rule="evenodd" d="M3.75 3A1.75 1.75 0 0 0 2 4.75v10.5c0 .966.784 1.75 1.75 1.75h4.253a2.25 2.25 0 0 1 1.94 1.132l1.205 2.41a.75.75 0 0 0 1.344 0l1.205-2.41a2.25 2.25 0 0 1 1.94-1.132H20.25A1.75 1.75 0 0 0 22 15.25V4.75A1.75 1.75 0 0 0 20.25 3H3.75ZM3.5 4.75a.25.25 0 0 1 .25-.25h16.5a.25.25 0 0 1 .25.25v10.5a.25.25 0 0 1-.25.25h-4.32a3.75 3.75 0 0 0-3.235 1.887l-1.12 2.24a.75.75 0 0 1-1.344 0l-1.12-2.24A3.75 3.75 0 0 0 5.82 15.5H3.75a.25.25 0 0 1-.25-.25V4.75Z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <span class="tool-name">Roteiro para TV</span>
+        </div>
+
+        <!-- Placeholder -->
+        <div class="tool-card placeholder">
+            <div class="tool-icon">+</div>
+            <span class="tool-name">Adicionar Nova Ferramenta</span>
+        </div>
+
+    </main>
 
     <footer class="footer-brands">
         <img src="marca_gazeta.png" alt="Marca Rede Gazeta" class="brand-logo">
         <img src="marca_jornalismo.png" alt="Marca Jornalismo Social" class="brand-logo logo-ajuste">
     </footer>
 
+    <!-- Modal Principal para Ferramentas (iframe) -->
     <div class="modal-overlay" id="tool-modal-overlay">
         <div class="modal-content">
             <button class="modal-close-button" id="modal-close">&times;</button>
@@ -67,6 +89,7 @@
         </div>
     </div>
 
+    <!-- Modal de Alerta (para o Placeholder) -->
     <div class="modal-overlay" id="alert-modal-overlay">
         <div class="alert-modal-content">
             <button class="modal-close-button" id="alert-modal-close">&times;</button>
@@ -77,5 +100,3 @@
     <script src="scripts.js"></script>
 </body>
 </html>
-
-
