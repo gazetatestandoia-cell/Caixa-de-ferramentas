@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otimizador de Títulos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+            <header class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Otimizador de Títulos</h1>
+                <p class="text-gray-500 mt-2">Preencha qualquer um dos campos e receba sugestões de títulos otimizados SEO</p>
+            </header>
+
+            <main>
+                <!-- Formulário de Entrada -->
+                <div class="space-y-6">
+                    <div>
+                        <label for="proposed-title" id="label-proposed-title" class="block text-sm font-medium text-gray-700 mb-1">Título proposto</label>
+                        <input type="text" id="proposed-title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Insira o título que você pensou">
+                    </div>
+                    <div>
+                        <label for="article-text" id="label-article-text" class="block text-sm font-medium text-gray-700 mb-1">Texto da reportagem</label>
+                        <textarea id="article-text" rows="8" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Cole aqui o corpo do texto da matéria..."></textarea>
+                    </div>
+                    <div>
+                        <label for="article-url" id="label-article-url" class="block text-sm font-medium text-gray-700 mb-1">Link da reportagem</label>
+                        <input type="url" id="article-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="https://seusite.com/noticia...">
+                    </div>
+                    <p class="text-xs text-center text-gray-500">Este sistema é assistido por Inteligência Artificial. Por isso, você DEVE conferir e validar todas as respostas que receber</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <button id="optimize-button" class="sm:col-span-2 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
+                            Otimizar Título
+                        </button>
+                        <button id="clear-button" class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition">
+                            Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seção de Resultados -->
+                <div id="results-container" class="mt-10 hidden">
+                    <!-- Loader -->
+                    <div id="loader" class="flex justify-center items-center my-6 hidden">
+                        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+                        <p class="ml-4 text-gray-600">Analisando e gerando sugestões...</p>
+                    </div>
+
+                    <!-- Mensagem de Erro -->
+                    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                        <strong class="font-bold">Ocorreu um erro!</strong>
+                        <span class="block sm:inline" id="error-text"></span>
+                    </div>
+                    
+                    <!-- Conteúdo dos Resultados -->
+                    <div id="results-content" class="space-y-8"></div>
+                </div>
+            </main>
+        </div>
+        <footer class="text-center mt-6 text-sm text-gray-500">
+            <p>Desenvolvido com IA para otimizar o alcance do seu conteúdo.</p>
+        </footer>
+    </div>
+
+    <script>
+        const optimizeButton = document.getElementById('optimize-button');
+        const clearButton = document.getElementById('clear-button');
+        const resultsContainer = document.getElementById('results-container');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const resultsContent = document.getElementById('results-content');
+
+        const articleUrlInput = document.getElementById('article-url');
+        const proposedTitleInput = document.getElementById('proposed-title');
+        const articleTextInput = document.getElementById('article-text');
+
+        const proposedTitleLabel = document.getElementById('label-proposed-title');
+        const articleTextLabel = document.getElementById('label-article-text');
+        const articleUrlLabel = document.getElementById('label-article-url');
+
+        // Função para atualizar os labels dinamicamente
+        function updateLabels() {
+            const fields = [
+                { input: proposedTitleInput, label: proposedTitleLabel, baseText: 'Título proposto' },
+                { input: articleTextInput, label: articleTextLabel, baseText: 'Texto da reportagem' },
+                { input: articleUrlInput, label: articleUrlLabel, baseText: 'Link da reportagem' }
+            ];
+
+            const isAnyFieldFilled = fields.some(field => field.input.value.trim() !== '');
+
+            fields.forEach(field => {
+                if (isAnyFieldFilled && field.input.value.trim() === '') {
+                    field.label.textContent = `${field.baseText} (opcional)`;
+                } else {
+                    field.label.textContent = field.baseText;
+                }
+            });
+        }
+        
+        // Adiciona listeners para a atualização dinâmica
+        [proposedTitleInput, articleTextInput, articleUrlInput].forEach(input => {
+            input.addEventListener('input', updateLabels);
+        });
+
+
+        // Função para chamar a API do Gemini
+        async function callGeminiAPI(prompt, useGrounding = false) {
+            // ########### IMPORTANTE ###########
+            // Para usar esta aplicação fora do ambiente original, você precisa de uma chave de API do Google.
+            // 1. Acesse https://aistudio.google.com/app/apikey
+            // 2. Crie uma nova chave de API.
+            // 3. Cole a chave gerada na linha abaixo, substituindo "SUA_CHAVE_API_AQUI".
+            const apiKey = "AIzaSyBS4FaQ1okqftnyK37UQdyuG308FRr0V4Y";
+            // ##################################
+
+            if (apiKey === "SUA_CHAVE_API_AQUI" || !apiKey) {
+                // Este erro será capturado pelo event listener e exibido ao usuário.
+                throw new Error("Chave de API do Google não encontrada. Por favor, adicione sua chave no código-fonte.");
+            }
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const systemInstruction = {
+                parts: [{
+                    text: `Você é um especialista em SEO para portais de notícias, com vasta experiência em otimização de títulos para mecanismos de busca (Google) e redes sociais. Sua tarefa é analisar o conteúdo fornecido e gerar sugestões de títulos que maximizem o alcance e o engajamento. Para a redação que usará esta ferramenta, o tamanho ideal para um título é exatamente 69 caracteres. Leve isso como uma regra prioritária. Responda sempre em português do Brasil.`
+                }]
+            };
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: systemInstruction,
+                generationConfig: {
+                    responseMimeType: "application/json",
+                }
+            };
+
+            if (useGrounding) {
+                payload.tools = [{ "google_search": {} }];
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error ? errorData.error.message : 'Falha na comunicação com a API.');
+                }
+                
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const cleanedText = candidate.content.parts[0].text.replace(/```json|```/g, '').trim();
+                    return JSON.parse(cleanedText);
+                } else {
+                    throw new Error('A resposta da IA está vazia ou em formato inesperado.');
+                }
+
+            } catch (error) {
+                console.error("Erro na chamada da API:", error);
+                throw error;
+            }
+        }
+
+        // Função para construir o prompt
+        function buildPrompt(url, title, text) {
+            const baseSchema = `
+              "idealTitle": "string",
+              "alternativeTitles": [
+                { "title": "string", "explanation": "string" },
+                { "title": "string", "explanation": "string" },
+                { "title": "string", "explanation": "string" },
+                { "title": "string", "explanation": "string" },
+                { "title": "string", "explanation": "string" }
+              ]`;
+            
+            const commonInstructions = `
+                - O "idealTitle" deve ser o título perfeito, otimizado para ter exatamente 69 caracteres e com alta força de palavras-chave. Esta é a regra mais importante.
+                - As "alternativeTitles" devem conter 5 outras boas opções, também buscando o tamanho ideal de 69 caracteres e variando em abordagem (ex: mais direto, mais apelativo, focado em um aspecto específico).
+                - A "explanation" para cada alternativa deve ter no máximo duas linhas, explicando os pontos fortes de SEO do título sugerido (ex: uso de palavra-chave de cauda longa, apelo emocional, geração de curiosidade, etc.).`;
+
+            let schemaParts = [];
+            let instructions = [];
+            let promptIntro = '';
+
+            if (title) {
+                schemaParts.push(`"proposedTitleAnalysis": { "isGoodEnough": true, "analysis": "string" }`);
+                instructions.push(
+                    `- Primeiro, analise o título proposto em "proposedTitleAnalysis". Avalie seu tamanho (comparando com o ideal de 69 caracteres), clareza, uso de palavras-chave e potencial de engajamento para SEO de notícias.`,
+                    `- Em "proposedTitleAnalysis.isGoodEnough", retorne 'true' se o título for excelente e uma mudança não for estritamente necessária. Caso contrário, retorne 'false'.`,
+                    `- Em "proposedTitleAnalysis.analysis", escreva uma análise concisa (2-3 linhas) sobre os pontos fortes e fracos do título. Se for bom, afirme que é uma ótima opção, mesmo que apresente outras sugestões.`
+                );
+            }
+
+            if (url) {
+                promptIntro = `Com base no conteúdo publicamente acessível na URL "${url}" e considerando o Título Proposto "${title || 'Nenhum'}", analise o material.`;
+                schemaParts.push(`"urlAnalysis": { "currentTitle": "string", "isChangeRecommended": false, "reasoning": "string" }`);
+                instructions.push(
+                    `- Em "urlAnalysis.currentTitle", extraia o título atual da página.`,
+                    `- Em "urlAnalysis.reasoning", explique se a mudança de título é recomendada, considerando que a matéria já pode ter performance e o impacto de mudar uma URL/título já indexado.`
+                );
+            } else {
+                promptIntro = `Analise o seguinte material de notícia. Título proposto: "${title || 'Nenhum'}". Texto da reportagem: "${text.substring(0, 3000) || 'Nenhum'}".`;
+            }
+
+            schemaParts.push(baseSchema);
+            instructions.push(commonInstructions);
+
+            const finalSchema = `{ ${schemaParts.join(', ')} }`;
+            const finalInstructions = instructions.join('\n');
+
+            return `${promptIntro}
+                Sua resposta DEVE ser um objeto JSON válido, seguindo estritamente este schema:
+                ${finalSchema}
+                Instruções:
+                ${finalInstructions}`;
+        }
+        
+        // Função para renderizar os resultados
+        function displayResults(data) {
+            resultsContent.innerHTML = '';
+            let contentHTML = '';
+
+            // Análise do Título Proposto, se existir
+            if (data.proposedTitleAnalysis) {
+                const recommendationClass = data.proposedTitleAnalysis.isGoodEnough ? 'text-green-700 border-green-300 bg-green-50' : 'text-orange-700 border-orange-300 bg-orange-50';
+                const recommendationText = data.proposedTitleAnalysis.isGoodEnough ? 'Ótima Opção! A mudança não é estritamente necessária.' : 'Pode ser otimizado.';
+                
+                contentHTML += `
+                    <div class="fade-in p-6 rounded-lg border ${recommendationClass}">
+                        <h2 class="text-xl font-bold text-gray-800 mb-3">Análise do Título Proposto</h2>
+                        <p class="font-semibold mb-2">${recommendationText}</p>
+                        <p class="text-gray-600 text-sm">${data.proposedTitleAnalysis.analysis}</p>
+                    </div>
+                `;
+            }
+
+            // Análise da URL, se existir
+            if (data.urlAnalysis) {
+                const recommendationClass = data.urlAnalysis.isChangeRecommended ? 'text-green-600' : 'text-orange-600';
+                const recommendationText = data.urlAnalysis.isChangeRecommended ? 'Mudança Recomendada' : 'Mudança Requer Cautela';
+                
+                contentHTML += `
+                    <div class="fade-in bg-gray-50 p-6 rounded-lg border">
+                        <h2 class="text-xl font-bold text-gray-800 mb-3">Análise da Publicação Existente</h2>
+                        <p class="text-gray-600 mb-2"><strong>Título Atual:</strong> ${data.urlAnalysis.currentTitle}</p>
+                        <p class="font-semibold mb-2 ${recommendationClass}">${recommendationText}</p>
+                        <p class="text-gray-600 text-sm">${data.urlAnalysis.reasoning}</p>
+                    </div>
+                `;
+            }
+
+            // Título Ideal
+            contentHTML += `
+                <div class="fade-in">
+                    <h2 class="text-xl font-bold text-gray-800 mb-3">Sugestão Principal</h2>
+                    <div class="bg-indigo-50 p-5 rounded-lg border border-indigo-200">
+                        <p class="text-2xl font-semibold text-indigo-800">${data.idealTitle}</p>
+                    </div>
+                </div>
+            `;
+
+            // Títulos Alternativos
+            contentHTML += `
+                <div class="fade-in">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">5 Outras Boas Opções</h2>
+                    <div class="space-y-4">
+                        ${data.alternativeTitles.map((alt, index) => `
+                            <div class="bg-white p-4 rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                                <p class="text-lg font-semibold text-gray-700 mb-1">${index + 1}. ${alt.title}</p>
+                                <p class="text-sm text-gray-500 italic">${alt.explanation}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            resultsContent.innerHTML = contentHTML;
+        }
+
+        function displayError(message) {
+            errorText.textContent = message || 'Não foi possível completar a sua solicitação. Tente novamente.';
+            errorMessage.classList.remove('hidden');
+        }
+
+        // Event listener do botão de otimizar
+        optimizeButton.addEventListener('click', async () => {
+            const url = articleUrlInput.value.trim();
+            const title = proposedTitleInput.value.trim();
+            const text = articleTextInput.value.trim();
+
+            if (!url && !title && !text) {
+                displayError('Por favor, forneça pelo menos uma informação para análise.');
+                resultsContainer.classList.remove('hidden');
+                loader.classList.add('hidden');
+                resultsContent.innerHTML = '';
+                return;
+            }
+
+            resultsContainer.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            resultsContent.innerHTML = '';
+            optimizeButton.disabled = true;
+            optimizeButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const prompt = buildPrompt(url, title, text);
+                const useGrounding = !!url;
+                const data = await callGeminiAPI(prompt, useGrounding);
+                displayResults(data);
+            } catch (error) {
+                displayError(error.message);
+            } finally {
+                loader.classList.add('hidden');
+                optimizeButton.disabled = false;
+                optimizeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+        
+        // Event listener do botão de limpar
+        clearButton.addEventListener('click', () => {
+            proposedTitleInput.value = '';
+            articleTextInput.value = '';
+            articleUrlInput.value = '';
+            resultsContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            resultsContent.innerHTML = '';
+            updateLabels();
+        });
+
+    </script>
+</body>
+</html>
+
