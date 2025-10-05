@@ -44,8 +44,9 @@ body {
 
 .toolbox-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 25px;
+    /* Reduzido o tamanho mínimo do card e o espaçamento */
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 20px;
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
@@ -62,7 +63,8 @@ body {
 .tool-card {
     background-color: var(--cinza-claro-fundo);
     border-radius: 10px;
-    padding: 20px;
+    /* Padding reduzido */
+    padding: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -86,18 +88,28 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 80px;
+    /* Altura do container do ícone reduzida */
+    height: 70px;
+}
+
+/* Nova regra para controlar o tamanho do SVG via CSS */
+.tool-card .tool-icon svg {
+    width: 70px;
+    height: 70px;
 }
 
 .tool-card.placeholder .tool-icon {
-    font-size: 4em;
+    /* Tamanho da fonte do '+' reduzido */
+    font-size: 3.5em;
     font-weight: bold;
     color: var(--laranja-destaque);
     margin-bottom: 0;
 }
 
 .tool-card .tool-name {
-    margin-top: 15px;
+    /* Margem e tamanho da fonte reduzidos */
+    margin-top: 10px;
+    font-size: 0.95em;
     font-weight: 700;
     color: var(--azul-texto-card);
 }
