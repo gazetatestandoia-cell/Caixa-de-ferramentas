@@ -47,10 +47,6 @@
                         <label for="article-text" id="label-article-text" class="block text-sm font-medium text-gray-700 mb-1">Texto da reportagem</label>
                         <textarea id="article-text" rows="8" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Cole aqui o corpo do texto da matéria..."></textarea>
                     </div>
-                    <div>
-                        <label for="article-url" id="label-article-url" class="block text-sm font-medium text-gray-700 mb-1">Link da reportagem</label>
-                        <input type="url" id="article-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="https://seusite.com/noticia...">
-                    </div>
                     <p class="text-xs text-center text-gray-500">Este sistema é assistido por Inteligência Artificial. Por isso, você DEVE conferir e validar todas as respostas que receber</p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                         <button id="optimize-button" class="sm:col-span-2 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
@@ -95,20 +91,17 @@
         const errorText = document.getElementById('error-text');
         const resultsContent = document.getElementById('results-content');
 
-        const articleUrlInput = document.getElementById('article-url');
         const proposedTitleInput = document.getElementById('proposed-title');
         const articleTextInput = document.getElementById('article-text');
 
         const proposedTitleLabel = document.getElementById('label-proposed-title');
         const articleTextLabel = document.getElementById('label-article-text');
-        const articleUrlLabel = document.getElementById('label-article-url');
-
+        
         // Função para atualizar os labels dinamicamente
         function updateLabels() {
             const fields = [
                 { input: proposedTitleInput, label: proposedTitleLabel, baseText: 'Título proposto' },
-                { input: articleTextInput, label: articleTextLabel, baseText: 'Texto da reportagem' },
-                { input: articleUrlInput, label: articleUrlLabel, baseText: 'Link da reportagem' }
+                { input: articleTextInput, label: articleTextLabel, baseText: 'Texto da reportagem' }
             ];
 
             const isAnyFieldFilled = fields.some(field => field.input.value.trim() !== '');
@@ -123,19 +116,19 @@
         }
         
         // Adiciona listeners para a atualização dinâmica
-        [proposedTitleInput, articleTextInput, articleUrlInput].forEach(input => {
+        [proposedTitleInput, articleTextInput].forEach(input => {
             input.addEventListener('input', updateLabels);
         });
 
 
         // Função para chamar a API do Gemini
-        async function callGeminiAPI(prompt, useGrounding = false) {
+        async function callGeminiAPI(prompt) {
             // ########### IMPORTANTE ###########
             // Para usar esta aplicação fora do ambiente original, você precisa de uma chave de API do Google.
             // 1. Acesse https://aistudio.google.com/app/apikey
             // 2. Crie uma nova chave de API.
             // 3. Cole a chave gerada na linha abaixo, substituindo "SUA_CHAVE_API_AQUI".
-            const apiKey = "AIzaSyBS4FaQ1okqftnyK37UQdyuG308FRr0V4Y";
+            const apiKey = "SUA_CHAVE_API_AQUI";
             // ##################################
 
             if (apiKey === "SUA_CHAVE_API_AQUI" || !apiKey) {
@@ -158,10 +151,6 @@
                     responseMimeType: "application/json",
                 }
             };
-
-            if (useGrounding) {
-                payload.tools = [{ "google_search": {} }];
-            }
 
             try {
                 const response = await fetch(apiUrl, {
@@ -192,7 +181,7 @@
         }
 
         // Função para construir o prompt
-        function buildPrompt(url, title, text) {
+        function buildPrompt(title, text) {
             const baseSchema = `
               "idealTitle": "string",
               "alternativeTitles": [
@@ -210,8 +199,7 @@
 
             let schemaParts = [];
             let instructions = [];
-            let promptIntro = '';
-
+            
             if (title) {
                 schemaParts.push(`"proposedTitleAnalysis": { "isGoodEnough": true, "analysis": "string" }`);
                 instructions.push(
@@ -221,17 +209,8 @@
                 );
             }
 
-            if (url) {
-                promptIntro = `Com base no conteúdo publicamente acessível na URL "${url}" e considerando o Título Proposto "${title || 'Nenhum'}", analise o material.`;
-                schemaParts.push(`"urlAnalysis": { "currentTitle": "string", "isChangeRecommended": false, "reasoning": "string" }`);
-                instructions.push(
-                    `- Em "urlAnalysis.currentTitle", extraia o título atual da página.`,
-                    `- Em "urlAnalysis.reasoning", explique se a mudança de título é recomendada, considerando que a matéria já pode ter performance e o impacto de mudar uma URL/título já indexado.`
-                );
-            } else {
-                promptIntro = `Analise o seguinte material de notícia. Título proposto: "${title || 'Nenhum'}". Texto da reportagem: "${text.substring(0, 3000) || 'Nenhum'}".`;
-            }
-
+            const promptIntro = `Analise o seguinte material de notícia. Título proposto: "${title || 'Nenhum'}". Texto da reportagem: "${text.substring(0, 3000) || 'Nenhum'}".`;
+           
             schemaParts.push(baseSchema);
             instructions.push(commonInstructions);
 
@@ -260,21 +239,6 @@
                         <h2 class="text-xl font-bold text-gray-800 mb-3">Análise do Título Proposto</h2>
                         <p class="font-semibold mb-2">${recommendationText}</p>
                         <p class="text-gray-600 text-sm">${data.proposedTitleAnalysis.analysis}</p>
-                    </div>
-                `;
-            }
-
-            // Análise da URL, se existir
-            if (data.urlAnalysis) {
-                const recommendationClass = data.urlAnalysis.isChangeRecommended ? 'text-green-600' : 'text-orange-600';
-                const recommendationText = data.urlAnalysis.isChangeRecommended ? 'Mudança Recomendada' : 'Mudança Requer Cautela';
-                
-                contentHTML += `
-                    <div class="fade-in bg-gray-50 p-6 rounded-lg border">
-                        <h2 class="text-xl font-bold text-gray-800 mb-3">Análise da Publicação Existente</h2>
-                        <p class="text-gray-600 mb-2"><strong>Título Atual:</strong> ${data.urlAnalysis.currentTitle}</p>
-                        <p class="font-semibold mb-2 ${recommendationClass}">${recommendationText}</p>
-                        <p class="text-gray-600 text-sm">${data.urlAnalysis.reasoning}</p>
                     </div>
                 `;
             }
@@ -314,11 +278,10 @@
 
         // Event listener do botão de otimizar
         optimizeButton.addEventListener('click', async () => {
-            const url = articleUrlInput.value.trim();
             const title = proposedTitleInput.value.trim();
             const text = articleTextInput.value.trim();
 
-            if (!url && !title && !text) {
+            if (!title && !text) {
                 displayError('Por favor, forneça pelo menos uma informação para análise.');
                 resultsContainer.classList.remove('hidden');
                 loader.classList.add('hidden');
@@ -334,9 +297,8 @@
             optimizeButton.classList.add('opacity-50', 'cursor-not-allowed');
 
             try {
-                const prompt = buildPrompt(url, title, text);
-                const useGrounding = !!url;
-                const data = await callGeminiAPI(prompt, useGrounding);
+                const prompt = buildPrompt(title, text);
+                const data = await callGeminiAPI(prompt);
                 displayResults(data);
             } catch (error) {
                 displayError(error.message);
@@ -351,7 +313,6 @@
         clearButton.addEventListener('click', () => {
             proposedTitleInput.value = '';
             articleTextInput.value = '';
-            articleUrlInput.value = '';
             resultsContainer.classList.add('hidden');
             errorMessage.classList.add('hidden');
             resultsContent.innerHTML = '';
@@ -361,4 +322,5 @@
     </script>
 </body>
 </html>
+
 
