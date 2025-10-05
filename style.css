@@ -13,19 +13,14 @@ body {
     font-family: 'Roboto Condensed', sans-serif;
     color: var(--branco-texto);
     margin: 0;
+    padding: 20px;
     text-align: center;
+    min-height: 100vh;
     box-sizing: border-box;
-    /* --- AJUSTES PARA REMOVER O SCROLL --- */
-    height: 100vh; /* Força o body a ter exatamente a altura da tela */
-    display: flex; /* Ativa o layout flexível */
-    flex-direction: column; /* Organiza os itens em coluna (cabeçalho em cima, ferramentas embaixo) */
-    overflow: hidden; /* Esconde qualquer barra de rolagem no corpo da página */
-    padding: 20px 20px 0 20px; /* Remove o padding de baixo */
 }
 
 .main-header {
     margin-bottom: 40px;
-    flex-shrink: 0; /* Impede que o cabeçalho encolha */
 }
 
 .main-header h1 {
@@ -44,26 +39,19 @@ body {
 
 .toolbox-container {
     display: grid;
-    /* Tamanho original dos cards restaurado */
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 25px;
     max-width: 1200px;
-    width: 100%;
     margin: 0 auto;
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-    /* --- AJUSTES PARA REMOVER O SCROLL --- */
-    flex-grow: 1; /* Faz esta área crescer para ocupar o espaço restante */
-    overflow-y: auto; /* Adiciona scroll INTERNO apenas se as ferramentas não couberem */
-    margin-bottom: 20px; /* Adiciona um respiro na parte de baixo */
 }
 
 .tool-card {
     background-color: var(--cinza-claro-fundo);
     border-radius: 10px;
-    /* Padding original restaurado */
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -88,18 +76,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Altura original do container do ícone restaurada */
     height: 80px;
 }
 
-/* Tamanho original do SVG via atributos no HTML (80x80) */
 .tool-card .tool-icon svg {
     width: 80px;
     height: 80px;
 }
 
 .tool-card.placeholder .tool-icon {
-    /* Tamanho original da fonte do '+' restaurado */
     font-size: 4em;
     font-weight: bold;
     color: var(--laranja-destaque);
@@ -107,7 +92,6 @@ body {
 }
 
 .tool-card .tool-name {
-    /* Estilos originais restaurados */
     margin-top: 15px;
     font-weight: 700;
     color: var(--azul-texto-card);
@@ -214,7 +198,7 @@ body {
 
 @media (max-width: 768px) {
     body {
-        padding: 10px 10px 0 10px;
+        padding: 10px;
     }
     
     .main-header {
@@ -223,7 +207,6 @@ body {
 
     .toolbox-container {
         padding: 15px;
-        margin-bottom: 10px;
     }
 
     .modal-content {
@@ -247,4 +230,5 @@ body {
         font-size: 20px;
     }
 }
+
 
