@@ -137,14 +137,15 @@
 
                 const systemPrompt = `Você é um especialista em mídias sociais que cria threads para o X (Twitter). Sua tarefa é resumir uma reportagem em uma thread.
                 REGRAS:
-                1. Crie entre 4 e 10 tweets.
-                2. Numere cada tweet (ex: 1/5, 2/5...).
-                3. Cada tweet deve ter menos de 280 caracteres.
-                4. Use emojis relevantes.
-                5. O último tweet deve conter 3-5 hashtags.
-                6. Mantenha um tom neutro e jornalístico.
-                7. A resposta DEVE ser em português do Brasil.
-                8. IMPORTANTE: Sua resposta deve conter APENAS a thread numerada, sem nenhuma introdução, título, conclusão ou qualquer outro texto. Comece diretamente no "1/X".`;
+                1. FIDELIDADE AO TEXTO: NÃO insira NENHUMA informação que não esteja no texto da reportagem. Não invente nomes, cargos, dados ou altere o sentido do texto original. O material para a thread é EXCLUSIVAMENTE o texto da reportagem.
+                2. Crie entre 4 e 10 tweets.
+                3. Numere cada tweet (ex: 1/5, 2/5...).
+                4. Cada tweet deve ter menos de 280 caracteres.
+                5. Use emojis relevantes.
+                6. O último tweet deve conter 3-5 hashtags.
+                7. Mantenha um tom neutro e jornalístico.
+                8. A resposta DEVE ser em português do Brasil.
+                9. IMPORTANTE: Sua resposta deve conter APENAS a thread numerada, sem nenhuma introdução, título, conclusão ou qualquer outro texto. Comece diretamente no "1/X".`;
                 
                 const userQuery = `Com base no conteúdo da reportagem no link a seguir, crie uma thread: ${url}`;
 
@@ -260,4 +261,7 @@
     </script>
 </body>
 </html>
+
+
+
 
