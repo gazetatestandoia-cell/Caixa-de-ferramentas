@@ -1,0 +1,14 @@
+{
+    "functions": {
+        "api/generate_thread.py": {
+            "runtime": "python3.9"
+        }
+    },
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/$1"
+        }
+    ]
+}
+
