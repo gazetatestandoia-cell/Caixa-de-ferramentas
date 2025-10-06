@@ -8,7 +8,11 @@
     "routes": [
         {
             "src": "/api/generate_thread",
-            "dest": "/api/generate_thread.py"
+            "dest": "api/generate_thread.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/$1"
         }
     ]
 }
