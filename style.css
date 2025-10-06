@@ -59,7 +59,7 @@ body {
     justify-content: center;
     aspect-ratio: 1 / 1;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease, filter 0.3s ease;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     border: 2px solid transparent;
 }
@@ -69,6 +69,23 @@ body {
     box-shadow: 0 12px 20px rgba(0,0,0,0.4);
     border-color: var(--laranja-destaque);
 }
+
+/* ============================================= */
+/* ESTILOS PARA CARDS DESATIVADOS                */
+/* ============================================= */
+.tool-card.tool-card-disabled {
+    opacity: 0.5; /* Reduz a opacidade para parecer "apagado" */
+    filter: grayscale(90%); /* Converte para tons de cinza */
+    cursor: not-allowed; /* Muda o cursor para indicar que não é clicável */
+}
+
+/* Remove o efeito de hover para cards desativados */
+.tool-card.tool-card-disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    border-color: transparent;
+}
+/* ============================================= */
 
 .tool-card .tool-icon {
     color: var(--azul-texto-card);
@@ -230,5 +247,4 @@ body {
         font-size: 20px;
     }
 }
-
 

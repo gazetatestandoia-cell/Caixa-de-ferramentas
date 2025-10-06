@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA PARA O MODAL PRINCIPAL (IFRAME) ---
-    const toolCards = document.querySelectorAll('.tool-card:not(.placeholder)');
+    // Atualizado para não selecionar cards com a classe .tool-card-disabled
+    const toolCards = document.querySelectorAll('.tool-card:not(.placeholder):not(.tool-card-disabled)');
     const modalOverlay = document.getElementById('tool-modal-overlay');
     const modalCloseButton = document.getElementById('modal-close');
     const toolIframe = document.getElementById('tool-iframe');
@@ -62,3 +63,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
