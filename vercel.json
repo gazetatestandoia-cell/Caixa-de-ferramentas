@@ -4,16 +4,7 @@
             "src": "api/generate_thread.py",
             "use": "@vercel/python"
         }
-    ],
-    "routes": [
-        {
-            "src": "/api/generate_thread",
-            "dest": "api/generate_thread.py"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/$1"
-        }
     ]
 }
+
 
