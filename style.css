@@ -1,22 +1,30 @@
-/* Paleta de Cores Inspirada na Rede Gazeta */
+/* ============================================= */
+/* NOVA PALETA DE CORES E FONTES                 */
+/* ============================================= */
 :root {
-    --azul-principal: #003366;
-    --laranja-destaque: #ff6600;
-    --branco-texto: #FFFFFF;
-    --cinza-claro-fundo: #f0f2f5;
-    --azul-texto-card: #003366;
+    --fundo-principal: #e9e9e9;
+    --fundo-container: rgba(255, 255, 255, 0.6);
+    --cor-titulo: #2d3748; /* Um cinza-azulado escuro */
+    --cor-subtitulo: #4a5568;
+    --fundo-card: #ffffff;
+    --cor-texto-card: #2d3748;
+    --cor-borda-hover: #f56565; /* Um vermelho-coral suave */
 }
 
 body {
-    background-color: var(--azul-principal);
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23002244' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    background-color: var(--fundo-principal);
+    /* Nova textura de fundo "pegboard" */
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0);
+    background-size: 20px 20px;
     font-family: 'Roboto Condensed', sans-serif;
-    color: var(--branco-texto);
+    color: var(--cor-subtitulo);
     margin: 0;
     padding: 20px;
     text-align: center;
     min-height: 100vh;
     box-sizing: border-box;
+    transition: background-color 0.3s ease;
 }
 
 .main-header {
@@ -24,16 +32,16 @@ body {
 }
 
 .main-header h1 {
-    font-family: 'Teko', sans-serif;
-    font-size: 3.5em;
-    color: var(--laranja-destaque);
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    font-family: 'Poppins', sans-serif; /* Nova fonte */
+    font-size: 3.2em;
+    color: var(--cor-titulo);
+    text-shadow: none; /* Sombra removida para um visual mais limpo */
     margin: 0;
 }
 
 .main-header p {
     font-size: 1.2em;
-    color: var(--branco-texto);
+    color: var(--cor-subtitulo);
     opacity: 0.9;
 }
 
@@ -44,13 +52,15 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--fundo-container);
     border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    /* Nova borda sutil */
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
 }
 
 .tool-card {
-    background-color: var(--cinza-claro-fundo);
+    background-color: var(--fundo-card);
     border-radius: 10px;
     padding: 20px;
     display: flex;
@@ -60,35 +70,31 @@ body {
     aspect-ratio: 1 / 1;
     cursor: pointer;
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease, filter 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    /* Sombra fraca aplicada */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     border: 2px solid transparent;
 }
 
 .tool-card:hover {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.4);
-    border-color: var(--laranja-destaque);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    border-color: var(--cor-borda-hover);
 }
 
-/* ============================================= */
-/* ESTILOS PARA CARDS DESATIVADOS                */
-/* ============================================= */
 .tool-card.tool-card-disabled {
-    opacity: 0.5; /* Reduz a opacidade para parecer "apagado" */
-    filter: grayscale(90%); /* Converte para tons de cinza */
-    cursor: not-allowed; /* Muda o cursor para indicar que não é clicável */
+    opacity: 0.5; 
+    filter: grayscale(90%); 
+    cursor: not-allowed; 
 }
 
-/* Remove o efeito de hover para cards desativados */
 .tool-card.tool-card-disabled:hover {
     transform: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     border-color: transparent;
 }
-/* ============================================= */
 
 .tool-card .tool-icon {
-    color: var(--azul-texto-card);
+    color: var(--cor-texto-card);
     margin-bottom: 10px;
     display: flex;
     align-items: center;
@@ -97,26 +103,27 @@ body {
 }
 
 .tool-card .tool-icon svg {
-    width: 80px;
-    height: 80px;
+    width: 70px; /* Ícones um pouco menores */
+    height: 70px;
+    opacity: 0.8;
 }
 
 .tool-card.placeholder .tool-icon {
     font-size: 4em;
     font-weight: bold;
-    color: var(--laranja-destaque);
+    color: var(--cor-borda-hover);
     margin-bottom: 0;
 }
 
 .tool-card .tool-name {
     margin-top: 15px;
     font-weight: 700;
-    color: var(--azul-texto-card);
-    font-size: 1em; /* Tamanho padrão */
+    color: var(--cor-texto-card);
+    font-size: 1em;
 }
 
 .tool-card.placeholder .tool-name {
-    color: var(--laranja-destaque);
+    color: var(--cor-borda-hover);
 }
 
 /* ESTILOS PARA O MODAL PRINCIPAL (IFRAME) */
@@ -126,7 +133,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 34, 68, 0.8);
+    /* Fundo escurecido mais suave */
+    background-color: rgba(45, 55, 72, 0.75);
+    backdrop-filter: blur(4px); /* Efeito de desfoque moderno */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -142,14 +151,14 @@ body {
 }
 
 .modal-content {
-    background-color: var(--cinza-claro-fundo);
+    background-color: #f7f7f7; /* Fundo do modal um pouco mais escuro que os cards */
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
     position: relative;
     width: 90vw;
     height: 90vh;
-    transform: scale(0.9);
+    transform: scale(0.95);
     transition: transform 0.3s ease;
 }
 
@@ -163,7 +172,7 @@ body {
     right: -15px;
     width: 40px;
     height: 40px;
-    background-color: var(--laranja-destaque);
+    background-color: var(--cor-borda-hover);
     color: white;
     border: none;
     border-radius: 50%;
@@ -173,7 +182,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     transition: transform 0.2s ease, top 0.3s ease, right 0.3s ease;
     z-index: 1010;
 }
@@ -186,32 +195,29 @@ body {
     width: 100%;
     height: 100%;
     border-radius: 5px;
+    background-color: white; /* Garante que o fundo do iframe seja branco */
 }
 
 /* ESTILOS PARA O MODAL DE ALERTA SIMPLES */
 .alert-modal-content {
-    background-color: var(--cinza-claro-fundo);
-    color: var(--azul-texto-card);
+    background-color: var(--fundo-card);
+    color: var(--cor-texto-card);
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
     position: relative;
     width: 90%;
     max-width: 500px;
     text-align: center;
     font-size: 1.2em;
     line-height: 1.6;
-    transform: scale(0.9);
+    transform: scale(0.95);
     transition: transform 0.3s ease;
 }
 
 .modal-overlay.active .alert-modal-content {
     transform: scale(1);
 }
-
-/* ================================================= */
-/* AJUSTES PARA EXPERIÊNCIA MOBILE (COM SAFE AREA)   */
-/* ================================================= */
 
 @media (max-width: 768px) {
     body {
@@ -230,16 +236,14 @@ body {
         width: 100vw;
         height: 100vh;
         border-radius: 0;
-        /* Adiciona padding para respeitar as áreas seguras do iPhone */
         padding-top: calc(10px + env(safe-area-inset-top));
         padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
-        box-sizing: border-box; /* Garante que o padding não aumente o tamanho */
+        box-sizing: border-box; 
     }
 
     .modal-close-button {
-        /* Reposiciona o botão para DENTRO, considerando as áreas seguras */
         top: calc(15px + env(safe-area-inset-top));
         right: calc(15px + env(safe-area-inset-right));
         width: 36px;
