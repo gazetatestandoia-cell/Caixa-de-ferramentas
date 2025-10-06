@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Chamadas para WhatsApp (Visual)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #E7ECEE; /* Fundo mais suave */
+            color: #1c1e21;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .main-content {
+            width: 100%;
+            max-width: 550px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            color: #005f53;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .link-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .link-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .link-input:focus {
+            border-color: #128c7e;
+            box-shadow: 0 0 0 3px rgba(18, 140, 126, 0.1);
+            outline: none;
+        }
+        .link-input.loading {
+            border-color: #f39c12;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath fill='%23f39c12' d='M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8A8 8 0 0 1 12 20Z' opacity='.5'/%3E%3Cpath fill='%23f39c12' d='M12 4a8 8 0 0 1 8 8a.5.5 0 0 0 1 0a9 9 0 0 0-9-9a.5.5 0 0 0 0 1Z'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='1s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: #aaa;
+            transition: fill 0.2s;
+        }
+        .delete-btn:hover svg {
+            fill: #e74c3c;
+        }
+
+        .actions { 
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px; 
+        }
+        .icon-button {
+            background-color: #075e54;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-button:hover { background-color: #128c7e; transform: translateY(-2px); }
+        .icon-button.button-secondary { background-color: #6c757d; }
+        .icon-button.button-secondary:hover { background-color: #5a6268; }
+        .icon-button svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .add-button {
+            background-color: #25d366; color: white; border: none; border-radius: 50%;
+            width: 36px; height: 36px; font-size: 26px; line-height: 36px; text-align: center;
+            font-weight: bold; cursor: pointer; display: block; margin: 10px 0 0 auto;
+            transition: all 0.3s;
+        }
+        .add-button:hover { background-color: #128c7e; transform: scale(1.1); }
+        
+        /* --- Estilo do Celular --- */
+        .preview-container {
+            width: 380px;
+        }
+        .phone {
+            width: 100%;
+            height: 750px;
+            border: 12px solid #1c1c1c;
+            border-radius: 40px;
+            background: #fdfdfd;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg');
+            background-size: 380%;
+            background-position: center;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .wa-header {
+            background-color: #005f53;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .wa-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ccc;
+            object-fit: cover;
+        }
+        .wa-header-info h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .wa-chat-area {
+            flex-grow: 1;
+            padding: 20px 10px;
+            overflow-y: auto;
+        }
+        #preview-placeholder {
+            color: #555;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        #preview-box {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 6px;
+            max-width: 90%;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        #preview-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #preview-image {
+            max-width: 100%;
+            border-radius: 6px;
+            min-height: 150px;
+            display: block;
+            background-color: #e0e0e0;
+        }
+        #preview-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+            padding: 10px;
+            min-height: auto;
+            color: #333;
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px solid #128c7e;
+            border-radius: 4px;
+        }
+
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #25d366;
+            color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; opacity: 0;
+            visibility: hidden; transition: opacity 0.5s, visibility 0.5s; z-index: 1000;
+        }
+        .toast.show { opacity: 1; visibility: visible; }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+        <h1>Gerador de Chamadas para WhatsApp</h1>
+
+        <div class="input-section">
+            <h2>Reportagens</h2>
+            <div id="link-inputs"></div>
+            <button id="add-link-button" class="add-button">+</button>
+        </div>
+        
+        <div class="actions">
+            <button id="copy-button" class="icon-button" title="Copiar Texto da Chamada">
+                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg>
+            </button>
+            <button id="clear-button" class="icon-button button-secondary" title="Limpar Tudo">
+                <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="preview-container">
+         <div class="phone">
+            <div class="phone-screen">
+                <div class="wa-header">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M12.036 6.637a.554.554 0 0 0-.782 0l-4.742 4.742a.554.554 0 0 0 0 .783l4.742 4.742a.554.554 0 0 0 .782 0l.783-.783a.554.554 0 0 0 0-.782L9.58 12.16l3.238-3.238a.554.554 0 0 0 0-.782l-.782-.783z"></path></svg>
+                    <img src="https://i.imgur.com/83AAQ17.jpeg" alt="Foto do perfil">
+                    <div class="wa-header-info">
+                        <h3>Espírito Santo - AG 10</h3>
+                    </div>
+                </div>
+                <div class="wa-chat-area">
+                    <div id="preview-placeholder">A pré-visualização da sua mensagem aparecerá aqui.</div>
+                    <div id="preview-box">
+                        <div id="preview-image-container">
+                            <img id="preview-image" src="" alt="Preview da matéria principal">
+                        </div>
+                        <div id="preview-text" contenteditable="true"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="toast" class="toast">Texto copiado com sucesso!</div>
+
+    <script>
+        const linkInputsContainer = document.getElementById('link-inputs');
+        const previewBox = document.getElementById('preview-box');
+        const previewImage = document.getElementById('preview-image');
+        const previewText = document.getElementById('preview-text');
+        const previewPlaceholder = document.getElementById('preview-placeholder');
+        const copyButton = document.getElementById('copy-button');
+        const clearButton = document.getElementById('clear-button');
+        const toast = document.getElementById('toast');
+        const addLinkButton = document.getElementById('add-link-button');
+
+        const MAX_LINKS = 10;
+        let articlesData = [];
+
+        function createNewInputRow(index) {
+            const row = document.createElement('div');
+            row.className = 'link-input-row';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'link-input';
+            input.placeholder = `Link da Matéria ${index + 1}`;
+            input.dataset.index = index;
+            input.addEventListener('paste', handleInputChange);
+            input.addEventListener('input', handleInputChange);
+            row.appendChild(input);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.title = 'Excluir Matéria';
+            deleteBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>`;
+            deleteBtn.addEventListener('click', (e) => {
+                handleDeleteRow(row);
+            });
+            row.appendChild(deleteBtn);
+            
+            linkInputsContainer.appendChild(row);
+        }
+        
+        function handleDeleteRow(rowElement) {
+            const indexToRemove = parseInt(rowElement.querySelector('.link-input').dataset.index, 10);
+            
+            // Remove from data array
+            articlesData.splice(indexToRemove, 1);
+            
+            // Remove from DOM
+            rowElement.remove();
+            
+            // Re-index subsequent DOM elements and their inputs
+            const remainingRows = linkInputsContainer.querySelectorAll('.link-input-row');
+            remainingRows.forEach((row, newIndex) => {
+                const input = row.querySelector('.link-input');
+                input.dataset.index = newIndex;
+                input.placeholder = `Link da Matéria ${newIndex + 1}`;
+            });
+            
+            // Update preview with the already modified articlesData
+            updatePreview(articlesData.filter(d => d));
+            
+            // Handle Add button visibility
+            if (linkInputsContainer.children.length < MAX_LINKS) {
+                addLinkButton.style.display = 'block';
+            }
+        }
+
+        function initializeInputs() {
+            linkInputsContainer.innerHTML = '';
+            createNewInputRow(0);
+            addLinkButton.style.display = 'block';
+        }
+        
+        addLinkButton.addEventListener('click', () => {
+            const currentInputCount = linkInputsContainer.children.length;
+            if (currentInputCount < MAX_LINKS) {
+                createNewInputRow(currentInputCount);
+            }
+            if (linkInputsContainer.children.length >= MAX_LINKS) {
+                addLinkButton.style.display = 'none';
+            }
+        });
+
+        let debounceTimer;
+        function handleInputChange(event) {
+            clearTimeout(debounceTimer);
+            const input = event.target;
+            debounceTimer = setTimeout(() => {
+                processLink(input);
+            }, 500);
+        }
+
+        async function processLink(input) {
+            const url = input.value.trim();
+            const index = parseInt(input.dataset.index, 10);
+            
+            input.classList.add('loading');
+
+            if (url) {
+                try {
+                    const articleInfo = await fetchArticleData(url);
+                    articlesData[index] = articleInfo;
+                } catch (error) {
+                    console.error("Erro ao buscar dados do artigo:", error);
+                    const errorMessage = error.message || `Não foi possível carregar os dados do link ${index + 1}. Verifique a URL e a conexão.`;
+                    alert(errorMessage);
+                    articlesData[index] = null;
+                }
+            } else {
+                articlesData[index] = null;
+            }
+            
+            input.classList.remove('loading');
+            
+            const activeArticles = articlesData.filter(data => data !== null && data.title);
+            updatePreview(activeArticles);
+        }
+
+        function updatePreview(activeArticles) {
+            if (activeArticles.length === 0) {
+                resetPreview();
+                return;
+            }
+            
+            previewPlaceholder.style.display = 'none';
+            previewBox.classList.add('visible');
+
+            previewImage.src = activeArticles[0].image || 'https://via.placeholder.com/600x315.png?text=Imagem+indisponível';
+
+            let formattedText = '';
+            if (activeArticles.length === 1) {
+                const article = activeArticles[0];
+                let titlePart = `*${article.title.replace(/\*/g, '')}*`;
+                
+                if (article.isColumn && article.author) {
+                    titlePart = `${article.author} | ${titlePart}`;
+                }
+                
+                formattedText = `${titlePart} [${article.link}]\n\n${article.description}`;
+            } else {
+                const textItems = activeArticles.map(article => {
+                    let titlePart = `*${article.title.replace(/\*/g, '')}*`;
+                    
+                    if (article.isColumn && article.author) {
+                        titlePart = `${article.author} | ${titlePart}`;
+                    }
+                    
+                    return `${titlePart} [${article.link}]`;
+                });
+                formattedText = textItems.join('\n\n');
+            }
+            
+            const formattedHtml = formattedText
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/\*(.*?)\*/g, '<b>$1</b>')
+                .replace(/\n/g, '<br>');
+
+            previewText.innerHTML = formattedHtml;
+        }
+
+        function resetPreview() {
+            previewPlaceholder.style.display = 'block';
+            previewBox.classList.remove('visible');
+            previewImage.src = '';
+            previewText.innerText = '';
+        }
+
+        async function shortenUrl(longUrl) {
+            try {
+                const apiUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`;
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('A API do TinyURL respondeu com um erro.');
+                }
+                const shortUrl = await response.text();
+                return shortUrl.startsWith('http') ? shortUrl : longUrl;
+            } catch (error) {
+                console.warn('Falha ao encurtar URL com TinyURL:', error);
+                return longUrl;
+            }
+        }
+
+        async function fetchArticleData(url) {
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl);
+            if (!response.ok) {
+                throw new Error(`Falha ao buscar metadados via proxy: ${response.statusText}`);
+            }
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+
+            const getMeta = (prop) => doc.querySelector(`meta[property="${prop}"]`)?.getAttribute('content');
+            
+            const title = getMeta('og:title') || doc.title || 'Título não encontrado';
+            const description = getMeta('og:description') || 'Descrição não encontrada';
+            const image = getMeta('og:image');
+
+            const isColumn = url.includes('https://www.agazeta.com.br/colunas/');
+            let author = null;
+
+            if (isColumn) {
+                author = getMeta('article:author');
+                if (!author) {
+                    const authorElement = doc.querySelector('.c-author__name, .author-name');
+                    if (authorElement) author = authorElement.textContent.trim();
+                }
+                if (!author) {
+                    try {
+                        const slug = new URL(url).pathname.split('/')[2];
+                        if (slug) {
+                            author = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                        }
+                    } catch (e) { console.error("Falha ao extrair autor da URL:", e); }
+                }
+            }
+
+            const shortLink = await shortenUrl(url);
+            
+            return {
+                title: title.trim(),
+                description: description.trim(),
+                image,
+                link: shortLink,
+                isColumn,
+                author: author ? author.trim() : null
+            };
+        }
+
+        copyButton.addEventListener('click', () => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = previewText.innerHTML;
+            tempDiv.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+            tempDiv.querySelectorAll('b, strong').forEach(bold => {
+                if(bold.innerText.trim()) {
+                    bold.replaceWith(`*${bold.innerText}*`);
+                }
+            });
+            const textToCopy = tempDiv.innerText;
+            if (!textToCopy.trim()) return;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 2000);
+            }).catch(err => {
+                console.error('Falha ao copiar texto: ', err);
+                alert('Não foi possível copiar o texto.');
+            });
+        });
+        
+        clearButton.addEventListener('click', () => {
+            articlesData = [];
+            resetPreview();
+            initializeInputs();
+        });
+
+        initializeInputs();
+        resetPreview();
+    </script>
+
+</body>
+</html>
