@@ -7,10 +7,19 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+        :root {
+            --celadon: #8fd694;
+            --emerald: #7dba84;
+            --asparagus: #77ad78;
+            --reseda-green: #6f8f72;
+            --walnut-brown: #504b43;
+            --background-color: #f8f9fa; /* Um cinza muito claro para o fundo */
+        }
+
         body {
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: #E7ECEE; /* Fundo mais suave */
-            color: #1c1e21;
+            background-color: var(--background-color);
+            color: var(--walnut-brown);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -32,14 +41,14 @@
         h1 {
             font-size: 28px;
             text-align: center;
-            color: #005f53;
+            color: var(--asparagus);
             margin-bottom: 25px;
         }
 
         h2 {
             font-size: 18px;
             font-weight: 500;
-            color: #333;
+            color: var(--walnut-brown);
             border-bottom: 1px solid #ddd;
             padding-bottom: 8px;
             margin-bottom: 16px;
@@ -66,8 +75,8 @@
             transition: all 0.3s;
         }
         .link-input:focus {
-            border-color: #128c7e;
-            box-shadow: 0 0 0 3px rgba(18, 140, 126, 0.1);
+            border-color: var(--asparagus);
+            box-shadow: 0 0 0 3px hsla(121, 25%, 57%, 0.2);
             outline: none;
         }
         .link-input.loading {
@@ -104,7 +113,7 @@
             margin-top: 20px; 
         }
         .icon-button {
-            background-color: #075e54;
+            background-color: var(--asparagus);
             color: white;
             border: none;
             border-radius: 50%;
@@ -118,9 +127,9 @@
             align-items: center;
             justify-content: center;
         }
-        .icon-button:hover { background-color: #128c7e; transform: translateY(-2px); }
-        .icon-button.button-secondary { background-color: #6c757d; }
-        .icon-button.button-secondary:hover { background-color: #5a6268; }
+        .icon-button:hover { background-color: var(--emerald); transform: translateY(-2px); }
+        .icon-button.button-secondary { background-color: var(--reseda-green); }
+        .icon-button.button-secondary:hover { background-color: var(--walnut-brown); }
         .icon-button svg {
             width: 24px;
             height: 24px;
@@ -128,12 +137,12 @@
         }
 
         .add-button {
-            background-color: #25d366; color: white; border: none; border-radius: 50%;
+            background-color: var(--celadon); color: white; border: none; border-radius: 50%;
             width: 36px; height: 36px; font-size: 26px; line-height: 36px; text-align: center;
             font-weight: bold; cursor: pointer; display: block; margin: 10px 0 0 auto;
             transition: all 0.3s;
         }
-        .add-button:hover { background-color: #128c7e; transform: scale(1.1); }
+        .add-button:hover { background-color: var(--emerald); transform: scale(1.1); }
         
         /* --- Estilo do Celular --- */
         .preview-container {
@@ -544,3 +553,4 @@
 
 </body>
 </html>
+
