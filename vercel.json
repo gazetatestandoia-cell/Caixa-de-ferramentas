@@ -1,13 +1,14 @@
 {
-    "functions": {
-        "api/generate_thread.py": {
-            "runtime": "python3.9"
+    "builds": [
+        {
+            "src": "api/generate_thread.py",
+            "use": "@vercel/python"
         }
-    },
+    ],
     "routes": [
         {
-            "src": "/(.*)",
-            "dest": "/$1"
+            "src": "/api/generate_thread",
+            "dest": "/api/generate_thread.py"
         }
     ]
 }
