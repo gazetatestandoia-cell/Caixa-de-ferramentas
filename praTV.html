@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escrevendo pra TV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .teleprompter-text {
+            font-family: 'Roboto Mono', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 antialiased">
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- Cabeçalho -->
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">Escrevendo pra TV</h1>
+            <p class="text-lg text-gray-400">Conversor de textos para telejornal</p>
+        </header>
+
+        <!-- Seção de Entrada -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
+            <div class="flex flex-col gap-6">
+                <!-- URL -->
+                <div>
+                    <label for="url-input" class="block text-sm font-medium text-gray-300 mb-2">Insira o link da reportagem:</label>
+                    <input type="url" id="url-input" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-gray-200" placeholder="https://exemplo.com/noticia">
+                    <p class="text-xs text-gray-500 mt-2">A extração de texto de links pode não funcionar em todos os sites.</p>
+                </div>
+                <!-- Área de texto -->
+                <div>
+                    <label for="raw-text" class="block text-sm font-medium text-gray-300 mb-2">Ou cole o texto bruto aqui:</label>
+                    <textarea id="raw-text" rows="8" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-gray-200" placeholder="Insira a matéria, apuração ou rascunho..."></textarea>
+                </div>
+                <!-- Limite de Parágrafos -->
+                <div>
+                    <label for="paragraph-limit" class="block text-sm font-medium text-gray-300 mb-2">Máximo de parágrafos para a nota:</label>
+                    <select id="paragraph-limit" class="w-full md:w-auto p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-gray-200">
+                        <option value="1">1 Parágrafo (Nota rápida)</option>
+                        <option value="2">2 Parágrafos</option>
+                        <option value="3">3 Parágrafos</option>
+                        <option value="4" selected>4 Parágrafos (Padrão)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <button id="convert-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 duration-200">
+                    Converter para Padrão TV
+                </button>
+            </div>
+        </div>
+        
+        <!-- Loading e Erro -->
+        <div id="loader" class="hidden flex-col items-center justify-center my-10">
+            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-600 h-24 w-24 mb-4"></div>
+            <p class="text-lg text-gray-400">Analisando e reescrevendo o texto. Aguarde...</p>
+        </div>
+        <div id="error-message" class="hidden bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg relative my-6" role="alert">
+            <strong class="font-bold">Erro!</strong>
+            <span class="block sm:inline" id="error-text"></span>
+        </div>
+
+
+        <!-- Seção de Saída -->
+        <div id="output-section" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Nota Pelada -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-b-2 border-blue-500 pb-2">NOTA PELADA (PARA O APRESENTADOR)</h2>
+                <div id="nota-pelada-output" class="teleprompter-text text-lg leading-relaxed text-gray-300"></div>
+            </div>
+            <!-- Nota Coberta -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-b-2 border-green-500 pb-2">NOTA COBERTA (SUGESTÃO DE ROTEIRO)</h2>
+                <div id="nota-coberta-output" class="teleprompter-text text-lg leading-relaxed text-gray-300"></div>
+            </div>
+        </div>
+
+        <!-- Botão de Download -->
+        <div id="download-section" class="hidden text-center mt-8">
+             <button id="download-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 duration-200">
+                Baixar Roteiro (.txt)
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const convertBtn = document.getElementById('convert-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const rawTextInput = document.getElementById('raw-text');
+        const urlInput = document.getElementById('url-input');
+        const paragraphLimitSelect = document.getElementById('paragraph-limit');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const outputSection = document.getElementById('output-section');
+        const downloadSection = document.getElementById('download-section');
+        const notaPeladaOutput = document.getElementById('nota-pelada-output');
+        const notaCobertaOutput = document.getElementById('nota-coberta-output');
+        
+        const API_MODEL = 'gemini-2.5-flash-preview-05-20';
+        const API_KEY = 'AIzaSyBS4FaQ1okqftnyK37UQdyuG308FRr0V4Y'; // Deixe em branco, será tratado pelo ambiente de execução
+
+        // Estrutura do prompt base fornecida pelo usuário
+        const SYSTEM_PROMPT = `Você é um jornalista de TV experiente, sênior, editor-chefe de telejornais da TV Globo.
+        Objetivo geral: Transformar qualquer texto enviado pelo usuário (matéria bruta, apuração, nota, rascunho ou o link de uma reportagem) em um texto pronto para exibição em telejornal, no formato NOTA COBERTA ou NOTA PELADA, respeitando as normas da língua portuguesa, o estilo jornalístico televisivo e a linguagem popular entendida para o público com escolaridade de ensino fundamental e médio.
+        
+        PROCESSO DE ANÁLISE E ADAPTAÇÃO:
+        1. Leitura técnica inicial: Identifica o tema central, os dados factuais e a estrutura narrativa. Elimine redundâncias, adjetivações e opiniões pessoais. Preserve o estilo e o tom do autor original, apenas ajustando para fluidez e clareza.
+        2. Aplicação de normas linguísticas e estilísticas: Corrige morfologia, sintaxe, regência e concordância. Simplifica o vocabulário, evitando construções complexas ou acadêmicas.
+        3. Aplicação das técnicas de redação para TV: Estrutura o texto conforme o gênero. NOTA COBERTA: texto com narração em off e imagens sugeridas entre colchetes (ex: [IMAGEM: PRESIDENTE CHEGANDO AO PALÁCIO]). NOTA PELADA: texto lido integralmente pelo apresentador, sem imagens. Usa frases curtas, diretas e em ordem lógica (sujeito-verbo-predicado). Prioriza voz ativa e tempo presente. Evita termos técnicos, siglas e jargões sem explicação.
+        4. Revisão da linguagem audiovisual: Escreve “como se falasse”, com ritmo oral e naturalidade. Cada frase carrega uma ideia central. Evita abstrações, priorizando imagens e ações concretas.
+        5. Controle de legibilidade e clareza: Verifique se o texto pode ser compreendido por qualquer telespectador com nível de ensino fundamental. Elimina períodos longos.
+        6. Formatação final: O texto final deve estar em CAIXA ALTA. Vírgulas devem ser representadas por / e ponto final por //.
+        
+        SÍNTESE DO COMANDO OPERACIONAL DO PROMPT:
+        "Reescreva o texto enviado pelo usuário em formato jornalístico televisivo, tipo NOTA COBERTA e NOTA PELADA, de acordo com os manuais de telejornalismo e gramática do português, garantindo clareza, concisão, voz ativa, linguagem popular e estrutura lógica. O texto deve estar em caixa alta, livre de adjetivos e pronto para ser lido em telejornal."`;
+
+        const showError = (message) => {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        };
+        
+        const hideError = () => {
+            errorMessage.classList.add('hidden');
+        };
+
+        const fetchWithExponentialBackoff = async (url, options, retries = 5, delay = 1000) => {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    if (response.status === 429) { // Too Many Requests
+                         console.warn(`Rate limited. Retrying in ${delay / 1000}s...`);
+                         await new Promise(resolve => setTimeout(resolve, delay));
+                         delay *= 2; // Exponential backoff
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+                    }
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    console.error(`Attempt ${i + 1} failed. Retrying...`, error);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        };
+
+        const callGeminiAPI = async (text, paragraphLimit) => {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_MODEL}:generateContent?key=${API_KEY}`;
+            
+            const userPrompt = `Transforme o texto a seguir. Gere a NOTA PELADA e a NOTA COBERTA, respeitando o limite máximo de ${paragraphLimit} parágrafos. \n\nTEXTO BRUTO:\n---\n${text}\n---\n\nResponda APENAS com um objeto JSON válido no formato a seguir, sem nenhuma formatação de markdown ou texto adicional: {"nota_pelada": "TEXTO DA NOTA PELADA AQUI...", "nota_coberta": "TEXTO DA NOTA COBERTA COM SUGESTÕES DE IMAGEM AQUI..."}`;
+
+            const payload = {
+                systemInstruction: {
+                    parts: [{ text: SYSTEM_PROMPT }]
+                },
+                contents: [{
+                    parts: [{ text: userPrompt }]
+                }]
+            };
+
+            const result = await fetchWithExponentialBackoff(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const candidate = result.candidates?.[0];
+            if (!candidate || !candidate.content?.parts?.[0]?.text) {
+                throw new Error('Resposta inválida da API.');
+            }
+            
+            let responseText = candidate.content.parts[0].text;
+            
+            // Limpa a resposta para garantir que seja um JSON válido
+            responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+            return JSON.parse(responseText);
+        };
+        
+        const fetchURLContent = async (url) => {
+             if (!url) return '';
+             // Usando um proxy CORS para buscar o conteúdo da URL
+             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+             try {
+                const response = await fetch(proxyUrl);
+                if (!response.ok) {
+                    throw new Error(`Não foi possível buscar o conteúdo da URL. Status: ${response.status}`);
+                }
+                const html = await response.text();
+                // Extração simples de texto. Pode não ser perfeita para todos os sites.
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const reader = new Readability(doc);
+                const article = reader.parse();
+                if (article && article.textContent) {
+                    return article.textContent;
+                }
+                throw new Error("Não foi possível extrair o conteúdo principal da página.");
+
+             } catch(error) {
+                 console.error("Erro ao buscar URL:", error);
+                 showError(`Falha ao extrair conteúdo de ${url}. Tente colar o texto manualmente.`);
+                 return null;
+             }
+        }
+
+
+        convertBtn.addEventListener('click', async () => {
+            hideError();
+            outputSection.classList.add('hidden');
+            downloadSection.classList.add('hidden');
+            loader.classList.remove('hidden');
+            
+            let inputText = rawTextInput.value.trim();
+            const urlValue = urlInput.value.trim();
+            const paragraphLimit = paragraphLimitSelect.value;
+
+            if (!inputText && !urlValue) {
+                showError('Por favor, insira um texto ou um link para converter.');
+                loader.classList.add('hidden');
+                return;
+            }
+
+            if (!inputText && urlValue) {
+                // A biblioteca Readability.js é necessária para extrair o conteúdo
+                // Adicionando via script tag dinamicamente.
+                if (typeof Readability === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.js';
+                    document.head.appendChild(script);
+                    await new Promise(resolve => script.onload = resolve);
+                }
+                inputText = await fetchURLContent(urlValue);
+                if (!inputText) {
+                    loader.classList.add('hidden');
+                    return;
+                }
+            }
+
+            try {
+                const result = await callGeminiAPI(inputText, paragraphLimit);
+                
+                if (result.nota_pelada && result.nota_coberta) {
+                    notaPeladaOutput.textContent = result.nota_pelada;
+                    notaCobertaOutput.textContent = result.nota_coberta;
+                    outputSection.classList.remove('hidden');
+                    downloadSection.classList.remove('hidden');
+                } else {
+                    throw new Error("A resposta da API não contém os dados esperados.");
+                }
+
+            } catch (error) {
+                console.error('Erro no processo de conversão:', error);
+                showError(error.message || 'Ocorreu um erro desconhecido. Tente novamente.');
+            } finally {
+                loader.classList.add('hidden');
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const peladaText = notaPeladaOutput.textContent;
+            const cobertaText = notaCobertaOutput.textContent;
+
+            const content = `==============================\nNOTA PELADA (PARA O APRESENTADOR)\n==============================\n\n${peladaText}\n\n\n==============================\nNOTA COBERTA (SUGESTÃO DE ROTEIRO)\n==============================\n\n${cobertaText}`;
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'roteiro_telejornal.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+    </script>
+</body>
+</html>
+
