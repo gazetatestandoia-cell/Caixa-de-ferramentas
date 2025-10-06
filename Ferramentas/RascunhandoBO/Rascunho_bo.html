@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rascunhando a partir do BO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+
+        <!-- Cabeçalho -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Rascunhando a partir do BO</h1>
+            <p class="text-gray-600 mt-2">Envie um Boletim de Ocorrência em PDF para gerar um rascunho de matéria</p>
+        </div>
+
+        <!-- Seção de Upload -->
+        <div class="space-y-6">
+            <div>
+                <label for="pdf-upload" class="block text-sm font-medium text-gray-700 mb-2">1. Arquivo PDF:</label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex text-sm text-gray-600">
+                            <label for="pdf-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                <span>Carregar um arquivo</span>
+                                <input id="pdf-upload" name="pdf-upload" type="file" class="sr-only" accept=".pdf">
+                            </label>
+                            <p class="pl-1">ou arraste e solte aqui</p>
+                        </div>
+                        <p id="file-name" class="text-xs text-gray-500">PDF até 10MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caixa de Texto com o conteúdo do PDF -->
+            <div>
+                <label for="pdf-content" class="block text-sm font-medium text-gray-700">2. Confira todo o texto gerado se está de acordo com as informações:</label>
+                <textarea id="pdf-content" rows="10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="O conteúdo do PDF aparecerá aqui..."></textarea>
+            </div>
+
+            <!-- Botão de Gerar -->
+            <div class="text-center">
+                <button id="generate-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-all" disabled>
+                    Gerar rascunho
+                </button>
+            </div>
+            <p class="text-center text-xs text-gray-500 mt-4">Este sistema é assistido por Inteligência Artificial. Por isso, você <strong>DEVE</strong> conferir e validar todas as respostas que receber.</p>
+
+
+            <!-- Seção de Resultados -->
+            <div id="output-section" class="hidden space-y-6 pt-6">
+                <div id="loader-container" class="flex justify-center items-center flex-col hidden">
+                    <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+                    <p class="mt-4 text-gray-600">A IA está a redigir o rascunho... Por favor, aguarde.</p>
+                </div>
+                
+                <div id="results-container" class="hidden space-y-8">
+                    <!-- Rascunho da Matéria -->
+                    <div class="p-6 border border-gray-200 rounded-lg bg-gray-50">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-gray-800">Rascunho de matéria</h2>
+                            <button class="copy-btn bg-gray-200 text-gray-700 text-sm font-medium py-1 px-3 rounded-md hover:bg-gray-300" data-target="materia-completa">Copiar</button>
+                        </div>
+                        <div id="materia-completa" class="prose max-w-none text-gray-700">
+                            <h3 id="materia-titulo" class="text-xl font-bold"></h3>
+                            <p id="materia-subtitulo" class="italic text-gray-600"></p>
+                            <p id="materia-corpo"></p>
+                        </div>
+                    </div>
+
+                    <!-- Resumo para AGora -->
+                    <div class="p-6 border border-gray-200 rounded-lg bg-gray-50">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-gray-800">Resumo para AGora</h2>
+                            <button class="copy-btn bg-gray-200 text-gray-700 text-sm font-medium py-1 px-3 rounded-md hover:bg-gray-300" data-target="resumo-agora">Copiar</button>
+                        </div>
+                        <div id="resumo-agora" class="prose max-w-none text-gray-700"></div>
+                    </div>
+                </div>
+
+                <!-- Tratamento de Erro -->
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                    <strong class="font-bold">Ocorreu um erro:</strong>
+                    <span class="block sm:inline" id="error-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
+
+        const pdfUpload = document.getElementById('pdf-upload');
+        const pdfContent = document.getElementById('pdf-content');
+        const generateBtn = document.getElementById('generate-btn');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        const outputSection = document.getElementById('output-section');
+        const loaderContainer = document.getElementById('loader-container');
+        const resultsContainer = document.getElementById('results-container');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        const materiaTitulo = document.getElementById('materia-titulo');
+        const materiaSubtitulo = document.getElementById('materia-subtitulo');
+        const materiaCorpo = document.getElementById('materia-corpo');
+        const resumoAgora = document.getElementById('resumo-agora');
+
+        // Lidar com o upload de arquivo
+        pdfUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                fileNameDisplay.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const typedarray = new Uint8Array(e.target.result);
+                    try {
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let text = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(' ');
+                        }
+                        pdfContent.value = text;
+                        generateBtn.disabled = !text.trim();
+                         if (!text.trim()) {
+                            showError("O PDF parece estar vazio ou não contém texto legível. Verifique se o documento não é uma imagem digitalizada.");
+                         } else {
+                            hideError();
+                         }
+                    } catch (error) {
+                        console.error("Erro ao ler o PDF:", error);
+                        showError("Não foi possível ler o arquivo PDF. Pode estar corrompido ou num formato não suportado.");
+                        generateBtn.disabled = true;
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                fileNameDisplay.textContent = 'Apenas arquivos PDF são permitidos.';
+                pdfContent.value = '';
+                generateBtn.disabled = true;
+            }
+        });
+        
+        pdfContent.addEventListener('input', () => {
+             generateBtn.disabled = !pdfContent.value.trim();
+        });
+
+        // Gerar notícia
+        generateBtn.addEventListener('click', async () => {
+            const pdfText = pdfContent.value;
+            if (!pdfText.trim()) {
+                alert("O conteúdo do PDF não pode estar vazio.");
+                return;
+            }
+
+            // Mostrar loader e esconder resultados/erros
+            outputSection.classList.remove('hidden');
+            loaderContainer.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            hideError();
+            generateBtn.disabled = true;
+
+            try {
+                const prompt = `
+                    Você é um jornalista profissional produzindo uma matéria para um site regional de grande relevância no Espírito Santo. Siga rigorosamente os critérios de noticiabilidade, utilizando o modelo da pirâmide invertida. O texto deve ser informativo, objetivo e sem erros de português. Evite adjetivos subjetivos e opinativos. Escreva de forma clara, direta e precisa. NÃO INCLUA NENHUMA INFORMAÇÃO QUE NÃO ESTEJA NO BOLETIM, NÃO TROQUE NOMES, NÃO SIMULE SITUAÇÕES, CIDADES, NADA.
+                    Regras a seguir:
+                    Título: Crie um título claro e objetivo, com palavras-chave do fato, com até 69 caracteres.
+                    Subtítulo: Crie um subtítulo de duas ou três linhas que complemente o título e instigue a leitura.
+                    Lide: O primeiro parágrafo deve responder às perguntas essenciais (o quê, quem, onde, quando, como e por quê, se disponíveis).
+                    Parágrafos curtos: Máximo de 3 a 4 linhas cada, para facilitar a leitura.
+                    Fontes e dados: Citar apenas dados confirmados e fontes oficiais (no caso, o boletim de ocorrência).
+                    Imparcialidade: Evite qualquer juízo de valor; concentre-se exclusivamente nos fatos narrados no boletim.
+                    Regionalização: Contextualize a informação para o público do Espírito Santo, citando nomes, locais e situações relacionadas à região que estão presentes no boletim.
+                    Preocupações legais e éticas: Se o autor for menor de idade, não mencione o nome dele ou características identificáveis. Neste caso, inclua logo após a menção ao infrator a frase: "O nome ou outras características do adolescente não estão sendo divulgados em respeito ao Estatuto da Criança e do Adolescente (ECA)."
+                    Estilo de texto: Use voz ativa e frases curtas. Siga a organização lógica decrescente de importância.
+                    Resumo para AGora: Produza, em paralelo, um texto resumido, de, no máximo 3 parágrafos, para uso no "AGora".
+                    --- CONTEÚDO DO BOLETIM DE Ocorrência ABAIXO ---
+                    ${pdfText}
+                `;
+
+                // #######################################################################
+                // ## MODIFICAÇÃO: A chamada agora é para o backend seguro.             ##
+                // #######################################################################
+                const response = await fetch('/api/RascunhandoBO.js', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Erro HTTP: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const jsonResponse = JSON.parse(candidate.content.parts[0].text);
+                    
+                    materiaTitulo.textContent = jsonResponse.titulo;
+                    materiaSubtitulo.textContent = jsonResponse.subtitulo;
+                    // Substituir quebras de linha por parágrafos para melhor formatação
+                    materiaCorpo.innerHTML = jsonResponse.materia.split('\n').filter(p => p.trim() !== '').map(p => `<p class="mb-4">${p}</p>`).join('');
+                    resumoAgora.innerHTML = jsonResponse.resumo_agora.split('\n').filter(p => p.trim() !== '').map(p => `<p class="mb-4">${p}</p>`).join('');
+
+                    resultsContainer.classList.remove('hidden');
+                } else {
+                    throw new Error("A resposta da IA está vazia ou em formato inesperado.");
+                }
+
+            } catch (error) {
+                console.error("Erro ao gerar notícia:", error);
+                showError(error.message);
+            } finally {
+                loaderContainer.classList.add('hidden');
+                generateBtn.disabled = false;
+            }
+        });
+        
+        // Funcionalidade de copiar
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.dataset.target;
+                const elementToCopy = document.getElementById(targetId);
+                let textToCopy = '';
+
+                if (targetId === 'materia-completa') {
+                    // Formata o texto da matéria para cópia
+                    const title = document.getElementById('materia-titulo').textContent;
+                    const subtitle = document.getElementById('materia-subtitulo').textContent;
+                    const body = document.getElementById('materia-corpo').innerText; // .innerText para preservar quebras de linha
+                    textToCopy = `${title}\n\n${subtitle}\n\n${body}`;
+                } else {
+                    textToCopy = elementToCopy.innerText;
+                }
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    button.textContent = 'Copiado!';
+                    setTimeout(() => {
+                        button.textContent = 'Copiar';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Erro ao copiar: ', err);
+                });
+            });
+        });
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
+
+
